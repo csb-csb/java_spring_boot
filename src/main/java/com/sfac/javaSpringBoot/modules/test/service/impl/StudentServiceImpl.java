@@ -8,6 +8,7 @@ import com.sfac.javaSpringBoot.modules.test.entity.Student;
 import com.sfac.javaSpringBoot.modules.test.repository.CardRepository;
 import com.sfac.javaSpringBoot.modules.test.repository.StudentRepository;
 import com.sfac.javaSpringBoot.modules.test.service.StudentService;
+import javafx.print.Collation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -69,5 +72,19 @@ public class StudentServiceImpl implements StudentService {
         Sort.Direction direction = Sort.Direction.DESC;
         Sort sort = new Sort(direction, "studentName");
         return studentRepository.findAll(sort);
+    }
+
+    @Override
+    public List<Student> getStudentByStudentName(String studentName, Integer cardId) {
+       if (cardId>0){
+           return studentRepository.getStudentsByParams(studentName, cardId);
+       }else {
+           return Optional
+                   .ofNullable(studentRepository.findTopByStudentNameLike(
+                           String.format("%s%S%s","%",studentName,"%")
+                   )).orElse(Collections.emptyList());
+       }
+
+
     }
 }

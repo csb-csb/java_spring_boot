@@ -47,5 +47,16 @@ public class StudentController {
         return studentService.getStudents();
     }
 
+    /**
+     * 127.0.0.1/api/students?studentName=hujiang ---- get
+     */
+     @GetMapping("/student")
+    public List<Student> getStudentByParams(
+            @RequestParam String studentName,
+            @RequestParam(required = false,defaultValue = "0") Integer cardId
+     ){
 
+
+         return studentService.getStudentByStudentName(studentName,cardId);
+     }
 }

@@ -22,4 +22,9 @@ public class CountryController {
     public Country getCountryByCountryName(@RequestParam String countryName){
         return countryService.getCountryByCountryName(countryName);
     }
+
+    @GetMapping("/redis/country/{countryId}")
+    public Country mograteCountryByRedis(@PathVariable int countryId) {
+        return countryService.mograteCountryByRedis(countryId);
+    }
 }

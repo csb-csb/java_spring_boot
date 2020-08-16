@@ -15,4 +15,6 @@ public interface StudentService {
     Page<Student> getStudentsBySearchVo(SearchVo searchVo);
 
     List<Student> getStudents();
+
+    List<Student> getStudentByStudentName(String studentName, Integer cardId);
 }
