@@ -1,0 +1,24 @@
+<h3>th:text</h3>
+<h1 th:text="${thymeleafTitle}">this is thymeleaf title</h1>
+<p th:text="${thymeleafTitle}">this is the thymeleaf ti-tle</p>
+<p>==================================================================</p>
+
+<h3>th:if,th:unless.</h3>
+<p th:if="${checked} == true">If true, this will display</p>
+<p th:unless="${checked} == false">If not false, this will display</p>
+<p th:if="${currentNumber}&lt;100">print if the currentNumber &lt;100</p>
+<p th:if="${thymeleafTitle} == null">name is null</p>
+<p>==================================================================</p>
+
+<h3>th:attr</h3>
+checkbox:<input type="text" th:attr="type=${changeType}" th:checked="${checked}"/>
+<p>==================================================================</p>
+
+<h3>url,href</h3>
+<a th:href="@{http://www.baidu.com}" target="_blank">Click it to turn to baidu</a><br>
+<a th:href="${baiduUrl}" target="_blank">Click it to turn to Shop beauty</a><br>
+<!-- 封装动态url、url查询参数 -->
+<a th:href="@{'/test/index/'+${city.cityId}}" th:text="${city.cityName}"></a>
+<a th:href="@{/test/index(pageSize=${city.cityId},currentPage='1')}" th:text="${city.cityName}"></a>
+<img th:src="@{${shopLogo}}"/>
+<p>==================================================================</p>
