@@ -64,7 +64,7 @@
     	level: TRACE<DEBUG<INFO<WARN<ERROR
     	我们在 appender file 的时候，并没有指定日志级别，在此由 root 来控制，输出指定级别及之上级别的日志
     -->
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="console" />
         <appender-ref ref="file" />
     </root>
