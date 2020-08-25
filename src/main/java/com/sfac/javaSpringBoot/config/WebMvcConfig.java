@@ -2,6 +2,8 @@ package com.sfac.javaSpringBoot.config;
 
 import com.sfac.javaSpringBoot.filter.RequestParamaFilter;
 import com.sfac.javaSpringBoot.interceptor.RequestViewInterceptor;
+import com.sfac.javaSpringBoot.utils.RedisUtils;
+import io.netty.util.internal.ResourcesUtil;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +14,9 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
@@ -27,7 +31,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
        private int httpPort;*/
         @Autowired
         private RequestViewInterceptor requestViewInterceptor;
-        @Bean
+
+        @Autowired
+        private ResourceConfigBean resourceConfigBean;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String osName=System.getProperty("os.name");
+        if (osName.startsWith("win")){
+            registry.addResourceHandler(resourceConfigBean.getRelativePathPattern()).
+                    addResourceLocations(ResourceUtils.FILE_URL_PREFIX +resourceConfigBean.
+                            getLocationPathForWindows());
+        }else {
+            registry.addResourceHandler(resourceConfigBean.getRelativePathPattern()).
+                    addResourceLocations(ResourceUtils.FILE_URL_PREFIX +
+                            resourceConfigBean.getLocationPathForLinux());
+        }
+    }
+
+    @Bean
         public Connector connector() {
             Connector connector = new Connector();
             connector.setPort(httpPort);
