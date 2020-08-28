@@ -21,10 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
-
-
 @Controller
 @RequestMapping("/test")
 public class TestController {
