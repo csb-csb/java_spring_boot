@@ -1,0 +1,167 @@
+一，选择题
+	 以下哪个不是python解释器     	D
+		CPython
+		IPython
+		Jython
+		py
+	下列哪个表达式在Python中是非法的？A
+		x = y = z = 1
+		x = (y = z + 1)
+		x, y = y, x
+		x += y
+	print("%d %% %d"%(3, 5)) 输出结果是？ A
+		3 % 5
+		3 %% 5
+		2
+		1
+	“今年第一季度GDP提高了x%”，x为float值，格式化字符串，x保留两位小数，下面哪个是正确的？C
+		print("今年第一季度GDP提高了%.2f"%(22.234,))
+		print("今年第一季度GDP提高了%.2f%"%(22.234,))
+		print("今年第一季度GDP提高了%.2f%%"%(22.234,))
+		print("今年第一季度GDP提高了{0}%".format(22.234))
+	l = ["cdsa", 32, 33.2, None, True];l.pop();print(l);打印结果是：D
+		["cdsa", 32, 33.2, True]
+		["cdsa", 32, None, True]
+		["cdsa", 32, 33.2, None]
+		[32, 33.2, None, True]
+	print(15 // 2);   B
+		1
+		7
+		7.5
+		8
+	下面哪个不是 python 的数据类型 D
+		int
+		str
+		set
+		double
+	*args 代表什么参数  A
+		位置参数
+		可变参数
+		可变关键字参数
+		命名关键字参数
+	函数多个返回值，实际上返回的是什么数据类型？A
+		list
+		set
+		tuple
+		dict
+	安装Django2.0.7版本，使用的什么命令？C
+		pip install django
+		pip install django=2.0.7
+		pip install django==2.0.7
+		pip install django version=2.0.7
+
+二、填空题
+	字符串前面添加u、r、b分别代表什么？
+ u代表对字符串进行unicode编码，r开头代表后面都是普通字符，b前缀代表的就是bytes，兼容python3版本
+	
+               requests模块请求远程服务器，如何设置相应编码？
+String parameter = request.getParameter("标签命名");
+		byte[] bytes = parameter.getBytes("ISO8859-1");
+		String str = new String(bytes,"UTF-8");
+
+	windows下执行python的方式；
+print('hello world')
+        print(2**100)
+        raw_input()
+
+	创建python package，会自动生成什么文件？
+__init__.py文件。
+
+	python变量作用域有哪些？
+定义在函数内部的变量，叫局部变量
+局部变量函数内部访问使用，函数外部不能访问使用
+定义在函数外部的变量，叫全局变量
+全局变量在函数内部和函数外部都可以访问使用
+
+三、问答题
+	python命名规则？
+自定义的命名，普遍采用一个单词，一个下划线
+module_name, 模块
+package_name, 包
+ClassName, 类
+method_name, 方法
+ExceptionName, 异常
+function_name, 函数
+GLOBAL_VAR_NAME, 全局变量
+instance_var_name, 实例
+function_parameter_name, 参数
+local_var_name. 本地变量
+类的命名方式是：CamelCase
+函数和方法的命名方式: lower_case_with_underscores
+
+	set删除操作中，pop、remove的区别？
+remove 是删除首个符合条件的元素。并不是删除特定的索引
+pop返回的是你弹出的那个数值
+
+	list使用+=和append函数的区别？
+append将对象整体添加到list尾部
+“+”是将对象单个元素依次添加到尾部
+
+	使用bs4解析响应内容，获取某div（class为aaa）下所有span节点；
+def news_page_data(url):
+    #创建一个新的容器
+    news_list = [];
+    #请求远端url获取资源
+    r = requests.get(url);
+    r.encoding = r.apparent_encoding;
+    #请求解析成文本，该出是解析器
+    bs = BeautifulSoup(r.text, "html.parser");
+    #根据标签逐级分离，形成list
+    li_list = bs.find(name="div", attrs={"class":"contMain fontSt"}).find_all(name='li');
+    #遍历对应的list
+    for li in li_list:
+        #每次遍历变量找到span中的内容，准备撞到集合
+        child_span = li.findChildren("span", recursive=False)[0];-------------此处就是找到所有的span节点
+        # 每次遍历变量找到a标签中的内容，准备撞到集合
+        child_a = li.findChildren("a", recursive=False)[0];
+        #遍历出每一页的网页网址（主页网址加分页网址）
+        new_page_url = __wjw_domain + child_a.get("href");
+        #首页数据添加每一页新的网址
+        new_dict = new_page_data(new_page_url);
+        #获取每一页span中的文本内容（键值对）
+        new_dict["日期"] = child_span.get_text();
+        #地区是一个固定值--四川属性
+        new_dict["地区"] = __wjw_regin;
+        #new的list中添加词典
+        news_list.append(new_dict);
+    return news_list;
+
+	简述Django操作流程、组件的作用；
+cmd---指定安装版本
+pip install django ---- 默认安装 Django 最新版本；
+pip install django==2.0.7 ---- 指定版本安装；
+对应python目录 cmd
+django-admin startproject python_django_demo  创建项目
+python manage.py runserver 0.0.0.0:8080   更改端口
+django-admin startapp my_app   创建项目
+Django 使用 pymysql 模块连接 mysql 数据库       pymysql.install_as_MySQLdb()
+创建的app注册到setting，数据连接账号密码等注册到setting
+
+
+
+
+四、编程题
+	定义一个函数，接受 0 个或多个函数，返回累计乘积；
+def multi():
+    try:
+        str=input("输入要计算的参数")
+        c=1
+        for item in str.split():
+        #通过for循环可根据特定符号简洁分割字符串
+        #split（）无参默认根据空格切割
+        #切割出来的是字符串，需强转成int型，便于运算
+            c=c*int(item)；
+        print(c)；
+        return c；
+    except:
+        print("error")
+
+
+
+
+	定义一个函数，去掉字符串前后的空格；
+def stry():
+    a=input("输入字符串");#此处直接输入也行
+    c=a.strip();
+    print(c)
+    return c;

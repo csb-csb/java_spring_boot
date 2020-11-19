@@ -1,0 +1,327 @@
+<!-- import css-->
+<link href="cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+<!-- NProgress -->
+<link href="/plugin/nprogress/nprogress.css" rel="stylesheet">
+<!-- iCheck -->
+<link href="/plugin/iCheck/skins/flat/green.css" rel="stylesheet">
+<!-- Datatables -->
+<link href="/plugin/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/plugin/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/plugin/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/plugin/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/plugin/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Users <small>Users list</small></h3>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <ul class="nav navbar-right panel_toolbox" style="margin-left:0; float: left;">
+                            <button id="addUserBtn" type="button" class="btn btn-primary"
+                                    data-toggle="modal" data-target="#addUserModal">Add</button>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card-box table-responsive">
+                                    <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th>UserId</th>
+                                            <th>UserName</th>
+                                            <th>Password</th>
+                                            <th>CreateDate</th>
+                                            <th>Operation</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="account/userAdd"></div>
+<div th:replace="account/userEdit"></div>
+
+
+<!-- import js-->
+<!-- FastClick -->
+<script src="/plugin/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="/plugin/nprogress/nprogress.js"></script>
+<!-- iCheck -->
+<script src="/plugin/iCheck/icheck.min.js"></script>
+<!-- Datatables -->
+<script src="/plugin/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/plugin/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="/plugin/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/plugin/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="/plugin/datatables.net-buttons/js/buttons.flash.min.js"></script>
+<script src="/plugin/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="/plugin/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="/plugin/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+<script src="/plugin/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="/plugin/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/plugin/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+<script src="/plugin/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+
+<script type="text/javascript">
+    var DEFAULT_PAGE_SIZE = 5;
+    $(document).ready(function() {
+        initUserTable(DEFAULT_PAGE_SIZE);
+
+        $("#addUserBtn").bind("click", function() {
+            intAddModal();
+        });
+
+        $("#insertUserBtn").bind("click", function() {
+            addUser();
+        });
+
+        $("#editUserBtn").bind("click", function() {
+            editUser();
+        });
+    });
+
+    function initUserTable(pageSize) {
+        $('#datatable').DataTable({
+            'paging': true, //分页
+            "serverSide": true, //开启后端分页
+            "pagingType": "full_numbers", //分页样式的类型simple/simple_numbers/full/full_numbers
+            "pageLength": pageSize, //定义初始的页长
+            "processing": true,
+            "destroy": true, //允许销毁替换，在表格重新查询时，可以自动销毁以前的data
+            'lengthChange': true, //控制是否能够调整每页的条数
+            'searching': true,
+            'data-show-refresh': true,
+            'ordering': true,
+            'autoWidth': false,
+            "ajax": function (data, callback, settings) {
+                // 从data获取查询数据
+                var columIndex = data.order[0].column;
+                var sort = data.order[0].dir;
+                var orderBy = data.columns[columIndex].name;
+                pageSize = data.length == undefined  ? pageSize : data.length;
+
+                var searchVo = {};
+                searchVo.currentPage = (data.start / pageSize) + 1;
+                searchVo.pageSize = pageSize;
+                searchVo.orderBy = orderBy;
+                searchVo.sort = sort;
+                searchVo.keyWord = data.search.value;
+
+                $.ajax({
+                    url : "/api/users",
+                    type : "post",
+                    contentType: "application/json",
+                    data : JSON.stringify(searchVo),
+                    success : function (rs) {
+                        var fData = {
+                            draw :0,
+                            recordsTotal: 0,
+                            recordsFiltered: 0,
+                            data: []
+                        };
+                        if (!rs) {
+                            layer.alert("请求出错，请稍后重试" + rs.errmsg, {icon: 2});
+                            callback(fData);
+                            return;
+                        };
+                        if (rs.list == null) {
+                            $('#datatable tbody tr').remove();
+                            $('#loading').remove();
+                            callback(fData);
+                            return;
+                        }
+                        $('#loading').remove();
+                        var gearDatas = [];
+                        for (var i = 0; i < rs.list.length; i++) {
+                            //包装行数据
+                            var rowData = new TData(rs.list[i].userId, rs.list[i].userName,
+                                rs.list[i].password, rs.list[i].createDate);
+                            // 将行数据放到数组里
+                            gearDatas.push(rowData);
+                        }
+                        fData.data = gearDatas;
+                        fData.recordsTotal = rs.total;
+                        fData.recordsFiltered = rs.total;
+                        callback(fData);
+                    },
+                    error : function (data) {
+                        layer.alert(data.responseText, {icon: 0});
+                    }
+                });
+            },
+            "columns": [ //定义行数据字段
+                {data: 'userId', name: "user_id", sortable: true},
+                {data: 'userName', name: "user_name", sortable: true},
+                {data: 'password', name: "password", sortable: true},
+                {data: 'createDate', name: "create_date", sortable: true},
+                {data: 'operate', width: '80px', sortable: false}
+            ]
+        });
+    }
+    //行数据结构
+    function TData(userId, userName, password, createDate) {
+        this.userId = userId;
+        this.userName = userName;
+        this.password = password;
+        this.createDate = createDate;
+        this.operate = function () {
+            return "<a href='#' class='btn_editcolor' data-toggle='modal' data-target='#userEditModal' " +
+                "onclick='initEditModal(\"" + userId + "\")'>编辑</a>&nbsp;" +
+                "<a href='javascript:void(0);' onclick='deleteUser(\"" + userId + "\")' class='btn_editcolor'>删除</a>";
+        }
+    }
+
+    function initRoles(rolesDivId) {
+        $.ajax({
+            url : "/api/roles",
+            type : "get",
+            success : function (rs) {
+                var rolesDiv = $("#" + rolesDivId);
+                $.each(rs, function(i, item) {
+                    rolesDiv.append("<input type='checkbox' value='"
+                        + item.roleId + "'/>" + item.roleName + " ");
+                });
+            },
+            error : function (data) {
+                layer.alert(data.responseText, {icon: 0});
+            }
+        });
+    }
+
+    function intAddModal() {
+        $("#userNameForAddPage").val("");
+        $("#passwordForAddPage").val("");
+        initRoles("rolesForAddPage", "roleElementForAdd");
+    }
+
+    function addUser() {
+        var user = {};
+        user.userName = $("#userNameForAddPage").val();
+        user.password = $("#passwordForAddPage").val();
+        var roles = new Array();
+        $.each($("input[name='roleElementForAdd']"), function(){
+            if(this.checked){
+                var role = {};
+                role.roleId = $(this).val();
+                roles.push(role);
+            }
+        });
+        user.roles = roles;
+
+        $.ajax({
+            url : "/api/user",
+            type : "post",
+            contentType: "application/json",
+            data : JSON.stringify(user),
+            success : function (rs) {
+                if (rs.status == 200) {
+                    initUserTable(DEFAULT_PAGE_SIZE);
+                } else {
+                    layer.alert(rs.messgae, {icon: 0});
+                }
+            },
+            error : function (data) {
+                layer.alert(data.responseText, {icon: 0});
+            }
+        });
+    }
+
+    function initEditModal(userId) {
+        initRoles("rolesForEditPage", "roleElementForEdit");
+
+        $.ajax({
+            url : "/api/user/" + userId,
+            type : "get",
+            success : function (rs) {
+                $("#userIdForEditPage").val(rs.userId);
+                $("#userNameForEditPage").val(rs.userName);
+                $("#userImgForEditPage").val(rs.userImg);
+                $.each(rs.roles, function(i, item){
+                    $("input[name='roleElementForEdit'][value=" + item.roleId + "]")
+                        .attr("checked","checked");
+                });
+            },
+            error : function (data) {
+                layer.alert(data.responseText, {icon: 0});
+            }
+        });
+    }
+
+    function editUser() {
+        var user = {};
+        user.userId = $("#userIdForEditPage").val();
+        user.userName = $("#userNameForEditPage").val();
+        user.userImg = $("#userImgForEditPage").val();
+        var roles = new Array();
+        $.each($("input[name='roleElementForEdit']"), function(){
+            if(this.checked){
+                var role = {};
+                role.roleId = $(this).val();
+                roles.push(role);
+            }
+        });
+        user.roles = roles;
+
+        $.ajax({
+            url : "/api/user",
+            type : "put",
+            contentType: "application/json",
+            data : JSON.stringify(user),
+            success : function (rs) {
+                if (rs.status == 200) {
+                    initUserTable(DEFAULT_PAGE_SIZE);
+                } else {
+                    layer.alert(rs.messgae, {icon: 0});
+                }
+            },
+            error : function (data) {
+                layer.alert(data.responseText, {icon: 0});
+            }
+        });
+    }
+
+    function deleteUser(userId) {
+        bootbox.confirm("Are you sure?", function(result) {
+            if(result) {
+                $.ajax({
+                    url : "/api/user/" + userId,
+                    type : "delete",
+                    success : function (data) {
+                        if (data.status == 200) {
+                            initUserTable(DEFAULT_PAGE_SIZE);
+                        } else {
+                            // window.location.href = data.object;
+                            layer.msg(data.message, {icon: 0});
+                        }
+                    },
+                    error : function (data) {
+                        layer.msg(data.responseText, {icon: 0});
+                    }
+                });
+            }
+        });
+    }
+</script>

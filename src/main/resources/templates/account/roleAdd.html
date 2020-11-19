@@ -1,0 +1,42 @@
+<div id="addUserModal" class="modal fade bs-example-modal-lg"
+     tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">User Add</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">User Name</label>
+                        <div class="col-md-8">
+                            <input id="userNameForAddPage" name="userName" class="form-control"
+                                   type="text" placeholder="Enter user name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Password</label>
+                        <div class="col-md-8">
+                            <input id="passwordForAddPage" name="password" class="form-control"
+                                   type="password" placeholder="Enter user name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Roles</label>
+                        <div class="col-md-8" id="rolesForAddPage" name="roles"></div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="insertUserBtn" type="button" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
